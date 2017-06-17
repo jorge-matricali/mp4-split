@@ -2,12 +2,12 @@ OBJECTS = mp4-split.o
 
 EXEC = mp4-split
 
-CXXFLAGS = -Wall
+CFLAGS = -Wall
 
-CXX = g++
+C = gcc
 
 all: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $(EXEC) $(OBJECTS)
+	$(C) $(CFLAGS) -o $(EXEC) $(OBJECTS)
 
 clean :
 	rm mp4-split mp4-split.o
