@@ -18,42 +18,46 @@ void print_char_sequence(char *sequence);
 int main(int argc, char *argv[])
 {
     if (argc == 1) {
-        printf("Usage: %s MP4_FILE\n", argv[0]);
-        return EXIT_FAILURE;
+        fprintf(stderr, "Usage: %s MP4_FILE\n", argv[0]);
+        exit(EXIT_FAILURE);
     }
 
     char *mp4filename = argv[1];
 
     if (!file_exists(mp4filename)) {
-        printf("Archivo inexistente (%s).\n", mp4filename);
-        return EXIT_FAILURE;
+        fprintf(stderr, "Archivo inexistente (%s).\n", mp4filename);
+        exit(EXIT_FAILURE);
     }
 
     FILE *mp4;
     mp4 = fopen(mp4filename, "rb");
 
+    if (mp4 == NULL) {
+        fprintf(stderr, "Cannot open file (%s).\n", mp4filename);
+        exit(EXIT_FAILURE);
+    }
+
     struct mp4header header;
 
-    fread(&header, sizeof(header), 1, mp4); //mp4.read((char *) &header, sizeof header);
+    fread(&header, sizeof(header), 1, mp4);
 
-    // print_char_sequence(header.header);
-    // print_char_sequence(header.mdb);
-    // printf("\n\n");
+    /* TODO: Checkear que el archivo sea un MP4 valido */
+    /* TODO: Leer el resto */
 
-    // ofstream outmp4("sample/test.mp4", ios::out | ios::binary);
-    //
-    // if (!outmp4) {
-    //     printf("No se puede escribir el archivo");
-    //     return EXIT_FAILURE;
-    // }
-    //
-    // outmp4.write((char *) &header, sizeof header);
+    fclose(mp4);
 
-    // outmp4.write((char *) &frames, sizeof frames);
 
-    // printf("\n\n%s", header);
-    printf("\n\n");
-    printf("Finished!\n");
+    char *mp4destfilename = "sample/test.mp4";
+    FILE *mp4dest;
+    mp4dest = fopen(mp4destfilename, "wb");
+    if (mp4dest == NULL) {
+        fprintf(stderr, "Cannot open dest file (%s).\n", mp4destfilename);
+        exit(EXIT_FAILURE);
+    }
+    fwrite(&header, sizeof(header), 1, mp4dest);
+    fclose(mp4dest);
+
+    printf("\n\nFinished!\n");
 }
 
 int file_exists(char *filename)
