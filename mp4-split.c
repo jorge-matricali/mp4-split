@@ -3,13 +3,48 @@
 #include <stdlib.h>
 
 struct mp4header {
-    char header[8];     // Header
-    char mb[4];         // Major brand
-    char mbv[4];        // Major brand version
-    char cb[4];         // Compatible brands
+    long unsigned offset;   // offset
+    char ftyp[4];           // "ftyp"
 
-    char mdb[8];        // Media data box
-    char us[24];        // Unused space
+    char mb[4];             // Major brand
+    char mbv[4];            // Major brand version
+    char cb[4];             // Compatible brands
+
+    char mdb[8];            // Media data box
+    char us[24];            // Unused space
+};
+
+struct MP4MediaData {
+    long unsigned offset;
+    char mdat[4];
+};
+
+struct MP4MovieHeader {
+    /**
+    mvhd
+    Aca deberiamos leer la duracion
+    */
+    long unsigned offset;   // Offset
+    char mvhd[4];           // "mhvd"
+
+    uint8_t version;        // 8-bit
+    char flags[3];          // 0xffffff
+};
+
+struct MP4MovieHeaderData_Version1 {
+    /* Si la version que levantamos en MP4MovieHeader == 1 */
+    creation_time; 8bits
+    modification_time; 8bits
+    time_scale; 4
+    duration; 8
+};
+
+struct MP4MovieHeaderData {
+    /* Si la version que levantamos en MP4MovieHeader != 1 */
+    creation_time; 4
+    modification_time; 4
+    time_scale; 4
+    duration; 4
 };
 
 int file_exists(char *filename);
