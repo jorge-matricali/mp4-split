@@ -1,13 +1,21 @@
-OBJECTS = mp4-split.o
+CC	= gcc
 
-EXEC = mp4-split
+CFLAGS	+= -Wall -g -std=gnu99 -O3
+LDFLAGS	+= `pkg-config --cflags --libs libavformat libavcodec`
 
-CFLAGS = -Wall
+NAME	= mp4-split
+SRCS	= mp4-split.c
+OBJS	= $(SRCS:.c=.o)
 
-C = gcc
+all: $(NAME)
 
-all: $(OBJECTS)
-	$(C) $(CFLAGS) -o $(EXEC) $(OBJECTS)
+$(NAME): $(OBJS)
+	$(CC) -o $(NAME) $(OBJS) $(LDFLAGS)
 
-clean :
-	rm mp4-split mp4-split.o
+clean:
+	rm -f $(OBJS)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all

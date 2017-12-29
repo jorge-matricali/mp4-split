@@ -1,23 +1,23 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-struct mp4header {
-    long unsigned offset;   // offset
-    char ftyp[4];           // "ftyp"
-
+typedef struct {
+    unsigned int offset;    // offset
+    unsigned int ftyp;      // "ftyp"
     char mb[4];             // Major brand
     char mbv[4];            // Major brand version
     char cb[4];             // Compatible brands
 
-    char mdb[8];            // Media data box
-    char us[24];            // Unused space
-};
+    // char mdb[8];            // Media data box
+    // char us[24];            // Unused space
+} MP4FileTypeIdentification;
 
-struct MP4MediaData {
-    long unsigned offset;
+typedef struct {
+    unsigned offset;
     char mdat[4];
-};
+} MP4FileMediaData;
 
 struct MP4MovieHeader {
     /**
@@ -33,22 +33,27 @@ struct MP4MovieHeader {
 
 struct MP4MovieHeaderData_Version1 {
     /* Si la version que levantamos en MP4MovieHeader == 1 */
-    creation_time; 8bits
-    modification_time; 8bits
-    time_scale; 4
-    duration; 8
+    unsigned long long creation_time;       // UTC date
+    unsigned long long modification_time;   // UTC date
+    unsigned int time_scale;
+    unsigned long long duration;
 };
 
 struct MP4MovieHeaderData {
     /* Si la version que levantamos en MP4MovieHeader != 1 */
-    creation_time; 4
-    modification_time; 4
-    time_scale; 4
-    duration; 4
+    unsigned int creation_time;     // UTC date
+    unsigned int modification_time; // UTC date
+    unsigned int time_scale;
+    unsigned int duration;
+};
+
+struct MP4MovieHeaderMetaData {
+
 };
 
 int file_exists(char *filename);
 void print_char_sequence(char *sequence);
+// char *int_to_string(unsigned int value);
 
 int main(int argc, char *argv[])
 {
@@ -72,11 +77,23 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    struct mp4header header;
+    /* Tama;o del archivo */
+    long filesize;
+    fseek(mp4, 0, SEEK_END);
+    filesize = ftell(mp4);
+    rewind(mp4);
+
+    /* Leemos las cabeceras */
+    MP4FileTypeIdentification header;
 
     fread(&header, sizeof(header), 1, mp4);
 
-    /* TODO: Checkear que el archivo sea un MP4 valido */
+    printf("\n\n");
+    if (1887007846 != header.ftyp) {
+        fprintf(stderr, "Invalid file format! (%s)\n", mp4filename);
+        exit(EXIT_FAILURE);
+    }
+
     /* TODO: Leer el resto */
 
     fclose(mp4);
@@ -103,7 +120,19 @@ int file_exists(char *filename)
 
 void print_char_sequence(char *sequence)
 {
-    for (int x = 0; x < (sizeof sequence); x++) {
+    printf("Tamanio sequence: %lu\n\n", sizeof(sequence));
+    for (int x = 0; x < sizeof(sequence); x++) {
         printf("%c", sequence[x]);
     }
 }
+
+// char *int_to_string(unsigned int value)
+// {
+//     const char hex[] = "0123456789abcdef";
+//     char buffer[4];
+//     buffer[0] = hex[value & f];
+//     buffer[1] = hex[(value >> 4) & f];
+//     buffer[2] = hex[(value >> 8) & f];
+//     buffer[3] = hex[value >> 12];
+//     return buffer;
+// }
